@@ -1,0 +1,14 @@
+# Schwartze-backend
+API and database for my [Schwartze-Ansingh project](https://www.schwartze-ansingh.com).
+
+The application will go live after I finished my research.
+I have 500 letters from the families Schwartze and Ansingh, written between 1880 and 1940. I have scanned all letters, then I read them and transcribed them (to ascii files), which is time consuming. This application serves to enter the data on the letters, to show the scanned letters and transcripts. After finishing the preparations, I'll continue the research and write a book. When the book is finished, the application will go live. The backend is in Java/Spring Boot, the frontend is in React.
+
+
+The frontend software is at https://www.github.com/xtien/schwartze-frontend
+
+The web site is at https://www.schwartze-ansingh.com 
+
+openapi http://localhost:8084/swagger-ui/index.html
+
+java -jar ./openapi-generator-cli.jar generate -i http://localhost:8084/v3/api-docs -g typescript-axios -pwithSeparateModelsAndApi=true -papiPackage=api -pmodelPackage=model -o generated-api 
