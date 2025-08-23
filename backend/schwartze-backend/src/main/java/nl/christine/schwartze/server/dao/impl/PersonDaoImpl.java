@@ -11,6 +11,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import nl.christine.schwartze.server.controller.enums.PersonOrderEnum;
 import nl.christine.schwartze.server.dao.PersonDao;
 import nl.christine.schwartze.server.model.Letter;
 import nl.christine.schwartze.server.model.Person;
@@ -26,7 +27,8 @@ import java.util.Locale;
 
 @SuppressWarnings("JpaQlInspection")
 @Component("personDao")
-public class PersonDaoImpl implements PersonDao {
+public class PersonDaoImpl implements PersonDao
+{
 
     @PersistenceContext(unitName = "defaultPU")
     private EntityManager entityManager;
@@ -35,12 +37,14 @@ public class PersonDaoImpl implements PersonDao {
     private static final String SELECT = "select a from ";
 
     @Override
-    public Person updatePerson(Person person) {
+    public Person updatePerson(Person person)
+    {
 
         Person existingPerson = getPerson(person.getId());
         if (existingPerson == null) {
             entityManager.persist(person);
-        } else {
+        }
+        else {
             existingPerson.setLastName(person.getLastName());
             existingPerson.setFirstName(person.getFirstName());
             existingPerson.setFullName(person.getFullName());
@@ -58,7 +62,8 @@ public class PersonDaoImpl implements PersonDao {
     }
 
     @Override
-    public List<Person> getAllPeople() {
+    public List<Person> getAllPeople()
+    {
         TypedQuery<Person> query = entityManager.createQuery(
                 SELECT + Person.class.getSimpleName()
                         + " a order by a.lastName",
@@ -67,12 +72,14 @@ public class PersonDaoImpl implements PersonDao {
     }
 
     @Override
-    public void deletePerson(Person person) {
+    public void deletePerson(Person person)
+    {
         entityManager.remove(person);
     }
 
     @Override
-    public void deletePerson(int id) {
+    public void deletePerson(int id)
+    {
         Person person = getPerson(id);
         if (person != null) {
             entityManager.remove(person);
@@ -80,12 +87,14 @@ public class PersonDaoImpl implements PersonDao {
     }
 
     @Override
-    public void merge(Person person) {
+    public void merge(Person person)
+    {
         entityManager.merge(person);
     }
 
     @Override
-    public Text getPersonText(int id) {
+    public Text getPersonText(int id)
+    {
         Person person = getPerson(id);
         if (person.getText() == null) {
             Text text = new Text();
@@ -96,29 +105,34 @@ public class PersonDaoImpl implements PersonDao {
     }
 
     @Override
-    public void persistIfNotExist(Person person) {
+    public void persistIfNotExist(Person person)
+    {
         if (person.getId() == 0) {
             entityManager.persist(person);
         }
     }
 
     @Override
-    public void savePerson(Person person) {
+    public void savePerson(Person person)
+    {
         if (person.getId() != 0) {
             entityManager.merge(person);
-        } else {
+        }
+        else {
             entityManager.persist(person);
         }
     }
 
     @Override
-    public Person persist(Person person) {
+    public Person persist(Person person)
+    {
         entityManager.persist(person);
         return person;
     }
 
     @Override
-    public List<Person> search(String searchTerm) {
+    public List<Person> search(String searchTerm)
+    {
         TypedQuery<Person> query = entityManager.createQuery(
                 SELECT + Person.class.getSimpleName() +
                         " a  where LOWER(a.firstName) LIKE :searchTerm" +
@@ -129,28 +143,37 @@ public class PersonDaoImpl implements PersonDao {
     }
 
     @Override
-    public List<Person> searchFirstAndLastName(String searchTerm) {
+    public List<Person> searchFirstAndLastName(String searchTerm, PersonOrderEnum orderBy)
+    {
 
         String array[] = searchTerm.split(" ");
         final String firstName = array[0];
         final String lastName = searchTerm.substring(searchTerm.indexOf(" ") + 1);
 
+        final String order = switch (orderBy) {
+            case FIRST_NAME -> "firstName";
+            case LAST_NAME -> "lastName";
+            case NUMBER -> "number";
+        };
+
         TypedQuery<Person> query = entityManager.createQuery(
                 SELECT + Person.class.getSimpleName() +
                         " a  where LOWER(a.firstName) = :firstName" +
-                        " and LOWER(a.lastName) = :lastName",
+                        " and LOWER(a.lastName) = :lastName order by " + order,
                 Person.class);
         List<Person> list = query.setParameter("firstName", firstName.toLowerCase(Locale.ROOT)).setParameter("lastName", lastName.toLowerCase(Locale.ROOT)).getResultList();
         return list;
     }
 
     @Override
-    public Person getPerson(int id) {
+    public Person getPerson(int id)
+    {
         return entityManager.find(Person.class, id);
     }
 
     @Override
-    public List<Person> getPersons() {
+    public List<Person> getPersons()
+    {
 
         TypedQuery<Person> query = entityManager.createQuery(
                 SELECT + Person.class.getSimpleName()
@@ -161,7 +184,8 @@ public class PersonDaoImpl implements PersonDao {
     }
 
     @Override
-    public Person getPersonByName(Person person) {
+    public Person getPersonByName(Person person)
+    {
 
         Person existingPerson;
 
@@ -169,7 +193,8 @@ public class PersonDaoImpl implements PersonDao {
                 SELECT + Person.class.getSimpleName() + " a where a.name = :firstname and a.lastName = :lastname", Person.class);
         try {
             existingPerson = query.setParameter("firstname", person.getFirstName()).setParameter("lastname", person.getLastName()).getSingleResult();
-        } catch (NoResultException nre) {
+        }
+        catch (NoResultException nre) {
             existingPerson = null;
         }
 
@@ -177,21 +202,24 @@ public class PersonDaoImpl implements PersonDao {
     }
 
     @Override
-    public List<Person> getPeople(List<Integer> ids) {
+    public List<Person> getPeople(List<Integer> ids)
+    {
 
         List<Person> people = new ArrayList<>();
         try {
             for (int id : ids) {
                 people.add(getPerson(id));
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             logger.error("Error getting people", e);
         }
         return people;
     }
 
     @Override
-    public List<Letter> getLettersForPerson(int id) {
+    public List<Letter> getLettersForPerson(int id)
+    {
         List<Letter> letters = new LinkedList<>();
         Person person = getPerson(id);
         letters.addAll(person.getLettersWritten());
@@ -200,13 +228,15 @@ public class PersonDaoImpl implements PersonDao {
     }
 
     @Override
-    public Person addNewPerson(Person person) {
+    public Person addNewPerson(Person person)
+    {
         entityManager.persist(person);
         return person;
     }
 
     @Override
-    public List<Person> getPersons(List<Integer> ids) {
+    public List<Person> getPersons(List<Integer> ids)
+    {
 
         TypedQuery<Person> query = entityManager.createQuery(
                 "select a from " + Person.class.getSimpleName()

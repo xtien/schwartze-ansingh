@@ -7,6 +7,7 @@
 
 package nl.christine.schwartze.server.test.service;
 
+import com.deepl.api.DeepLException;
 import nl.christine.schwartze.server.model.Subject;
 import nl.christine.schwartze.server.model.Text;
 import nl.christine.schwartze.server.service.SubjectService;
@@ -35,7 +36,9 @@ public class TestSubject {
     String language = "en";
 
     @Test
-    public void testAddSubject() {
+    public void testAddSubject()
+    throws DeepLException, InterruptedException
+    {
         subject = createSubject();
         subjectService.addOrUpdate(subject, defaultLanguage);
 
@@ -45,7 +48,9 @@ public class TestSubject {
     }
 
     @Test
-    public void testDeleteSubject() {
+    public void testDeleteSubject()
+    throws DeepLException, InterruptedException
+    {
         subject = createSubject();
         Text text = new Text();
         text.setTextString(textString);
@@ -59,7 +64,9 @@ public class TestSubject {
     }
 
     @Test
-    public void testUpdateSubject() {
+    public void testUpdateSubject()
+    throws DeepLException, InterruptedException
+    {
         subject = createSubject();
         subjectService.addOrUpdate(subject, defaultLanguage);
 
@@ -76,7 +83,9 @@ public class TestSubject {
     }
 
     @Test
-    public void testAddText() {
+    public void testAddText()
+    throws DeepLException, InterruptedException
+    {
         subject = createSubject();
         subjectService.addOrUpdate(subject, defaultLanguage);
 
@@ -94,7 +103,9 @@ public class TestSubject {
     }
 
     @Test
-    public void testUpdateText() {
+    public void testUpdateText()
+    throws DeepLException, InterruptedException
+    {
         subject = createSubject();
         subjectService.addOrUpdate(subject, defaultLanguage);
         Subject result = subjectService.getSubjectById(subject.getId(), "es");

@@ -10,6 +10,7 @@ package nl.christine.schwartze.server.dao.impl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import nl.christine.schwartze.server.controller.enums.LettersOrderByEnum;
 import nl.christine.schwartze.server.dao.LetterDao;
 import nl.christine.schwartze.server.exception.LetterNotFoundException;
 import nl.christine.schwartze.server.model.Letter;
@@ -19,18 +20,25 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component("letterDao")
-public class LetterDaoImpl implements LetterDao {
+public class LetterDaoImpl implements LetterDao
+{
 
     @PersistenceContext(unitName = "defaultPU")
     private EntityManager em;
     private int maxLetterNumber = 860;
 
     @Override
-    public List<Letter> getLetters() {
+    public List<Letter> getLetters(LettersOrderByEnum orderBy)
+    {
+        String order = switch (orderBy) {
+            case DATE -> "date";
+            case NUMBER -> "number";
+        };
+
 
         TypedQuery<Letter> query = em.createQuery(
                 "select a from " + Letter.class.getSimpleName()
-                        + " a order by a.number",
+                        + " a order by " + order,
                 Letter.class);
 
         List<Letter> result = query.getResultList();
@@ -39,13 +47,15 @@ public class LetterDaoImpl implements LetterDao {
     }
 
     @Override
-    public void create(Letter letter) {
+    public void create(Letter letter)
+    {
 
         em.persist(letter);
     }
 
     @Override
-    public Letter getLetterForNumber(int letterNumber) {
+    public Letter getLetterForNumber(int letterNumber)
+    {
 
         TypedQuery<Letter> query = em.createQuery(
                 "select a from " + Letter.class.getSimpleName()
@@ -54,13 +64,15 @@ public class LetterDaoImpl implements LetterDao {
 
         try {
             return query.setParameter(Letter.NUMBER, letterNumber).getSingleResult();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             return null;
         }
     }
 
     @Override
-    public Letter getNextLetter(int letterNumber) {
+    public Letter getNextLetter(int letterNumber)
+    {
         Letter result = null;
         while (result == null && letterNumber <= maxLetterNumber) {
             result = getLetterForNumber(++letterNumber);
@@ -69,7 +81,8 @@ public class LetterDaoImpl implements LetterDao {
     }
 
     @Override
-    public Letter getPreviousLetter(int letterNumber) {
+    public Letter getPreviousLetter(int letterNumber)
+    {
         Letter result = null;
         while (result == null && letterNumber > 0) {
             result = getLetterForNumber(--letterNumber);
@@ -78,17 +91,20 @@ public class LetterDaoImpl implements LetterDao {
     }
 
     @Override
-    public void persist(Letter letter) {
+    public void persist(Letter letter)
+    {
         em.persist(letter);
     }
 
     @Override
-    public Letter getLetterForId(int id) {
+    public Letter getLetterForId(int id)
+    {
         return em.find(Letter.class, id);
     }
 
     @Override
-    public Letter updateLetterComment(int letterNumber, String text, String date) {
+    public Letter updateLetterComment(int letterNumber, String text, String date)
+    {
         Letter letter = getLetterForNumber(letterNumber);
         letter.setComment(text);
         letter.setDate(date);
@@ -96,7 +112,8 @@ public class LetterDaoImpl implements LetterDao {
     }
 
     @Override
-    public Letter addLetter(Letter letter) {
+    public Letter addLetter(Letter letter)
+    {
 
         if (letter.getId() > 0) {
             return null;
@@ -108,7 +125,9 @@ public class LetterDaoImpl implements LetterDao {
     }
 
     @Override
-    public void deleteLetter(Letter letter) throws LetterNotFoundException {
+    public void deleteLetter(Letter letter)
+    throws LetterNotFoundException
+    {
         Letter existingLetter = getLetterForId(letter.getId());
         if (existingLetter != null) {
             existingLetter.getToLocations().clear();
@@ -116,13 +135,15 @@ public class LetterDaoImpl implements LetterDao {
             existingLetter.getRecipients().clear();
             existingLetter.getSenders().clear();
             em.remove(existingLetter);
-        } else {
+        }
+        else {
             throw new LetterNotFoundException();
         }
     }
 
     @Override
-    public Text getText(int id) {
+    public Text getText(int id)
+    {
         Letter letter = getLetterForId(id);
         if (letter.getText() == null) {
             Text text = new Text();

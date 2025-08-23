@@ -65,7 +65,7 @@ public class PersonController {
         PeopleResult peopleResult = new PeopleResult();
 
         switch (request.getOrderBy()){
-            case NAME -> peopleResult.setPeople(personService.getAllPeopleByLastName());
+            case LAST_NAME -> peopleResult.setPeople(personService.getAllPeopleByLastName());
             case FIRST_NAME -> peopleResult.setPeople(personService.getAllPeopleByFirstName());
             case NUMBER -> peopleResult.setPeople(personService.getAllPeopleByNumber());
         }
@@ -98,7 +98,7 @@ public class PersonController {
         PeopleResult result = new PeopleResult();
 
         try {
-            result.setPeople(personService.search(request.getSearchTerm()));
+            result.setPeople(personService.search(request.getSearchTerm(), request.getOrderBy()));
         } catch (Exception e) {
             logger.error("Error getting references",e);
         }

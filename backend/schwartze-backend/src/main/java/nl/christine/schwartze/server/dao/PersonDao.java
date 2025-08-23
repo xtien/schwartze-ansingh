@@ -7,6 +7,7 @@
 
 package nl.christine.schwartze.server.dao;
 
+import nl.christine.schwartze.server.controller.enums.PersonOrderEnum;
 import nl.christine.schwartze.server.model.Letter;
 import nl.christine.schwartze.server.model.Person;
 import nl.christine.schwartze.server.model.Text;
@@ -47,7 +48,7 @@ public interface PersonDao {
 
     List<Person> search(String searchTerm);
 
-    List<Person> searchFirstAndLastName(String searchTerm);
+    List<Person> searchFirstAndLastName(String searchTerm, PersonOrderEnum orderBy);
 
     List<Person> getPersons(List<Integer> ids);
 }

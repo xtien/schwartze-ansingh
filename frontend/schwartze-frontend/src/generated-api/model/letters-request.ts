@@ -42,9 +42,7 @@ export interface LettersRequest {
 
 export const LettersRequestOrderByEnum = {
     Date: 'DATE',
-    Number: 'NUMBER',
-    SenderLastname: 'SENDER_LASTNAME',
-    SenderFirstname: 'SENDER_FIRSTNAME'
+    Number: 'NUMBER'
 } as const;
 
 export type LettersRequestOrderByEnum = typeof LettersRequestOrderByEnum[keyof typeof LettersRequestOrderByEnum];

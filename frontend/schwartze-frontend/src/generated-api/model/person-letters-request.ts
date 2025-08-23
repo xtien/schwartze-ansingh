@@ -54,9 +54,7 @@ export const PersonLettersRequestToFromEnum = {
 export type PersonLettersRequestToFromEnum = typeof PersonLettersRequestToFromEnum[keyof typeof PersonLettersRequestToFromEnum];
 export const PersonLettersRequestOrderByEnum = {
     Date: 'DATE',
-    Number: 'NUMBER',
-    SenderLastname: 'SENDER_LASTNAME',
-    SenderFirstname: 'SENDER_FIRSTNAME'
+    Number: 'NUMBER'
 } as const;
 
 export type PersonLettersRequestOrderByEnum = typeof PersonLettersRequestOrderByEnum[keyof typeof PersonLettersRequestOrderByEnum];

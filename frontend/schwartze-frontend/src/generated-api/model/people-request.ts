@@ -47,7 +47,7 @@ export interface PeopleRequest {
 }
 
 export const PeopleRequestOrderByEnum = {
-    Name: 'NAME',
+    LastName: 'LAST_NAME',
     Number: 'NUMBER',
     FirstName: 'FIRST_NAME'
 } as const;

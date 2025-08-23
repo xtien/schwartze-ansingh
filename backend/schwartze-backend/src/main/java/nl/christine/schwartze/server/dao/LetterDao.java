@@ -7,6 +7,7 @@
 
 package nl.christine.schwartze.server.dao;
 
+import nl.christine.schwartze.server.controller.enums.LettersOrderByEnum;
 import nl.christine.schwartze.server.exception.LetterNotFoundException;
 import nl.christine.schwartze.server.model.Letter;
 import nl.christine.schwartze.server.model.Text;
@@ -15,7 +16,7 @@ import java.util.List;
 
 public interface LetterDao {
 
-    List<Letter> getLetters();
+    List<Letter> getLetters(LettersOrderByEnum orderBy);
 
     void create(Letter letter);
 

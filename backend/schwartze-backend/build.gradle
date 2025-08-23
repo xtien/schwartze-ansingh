@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'Schwartze'
-version '2.0.9-SNAPSHOT'
+version '2.1.1-SNAPSHOT'
 
 ext {
     springSecurityVersion = "6.4.5"
@@ -59,6 +59,8 @@ dependencies {
     implementation group: 'org.apache.lucene', name: 'lucene-core', version: luceneVersion
     implementation group: 'org.apache.lucene', name: 'lucene-analyzers-common', version: '8.11.4'
     implementation group: 'org.apache.lucene', name: 'lucene-queryparser', version: luceneVersion
+
+ //   implementation("com.github.wslf:LevenshteinDistance:1.0.0")
 
     testImplementation group: 'junit', name: 'junit', version: junitVersion
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion

@@ -7,6 +7,7 @@
 
 package nl.christine.schwartze.server.service.impl;
 
+import nl.christine.schwartze.server.controller.enums.PersonOrderEnum;
 import nl.christine.schwartze.server.controller.request.EditLinkRequest;
 import nl.christine.schwartze.server.controller.result.CombinePersonResult;
 import nl.christine.schwartze.server.controller.result.EditLinkResult;
@@ -261,14 +262,14 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     @Transactional("transactionManager")
-    public List<Person> search(final String searchTerm) {
+    public List<Person> search(final String searchTerm, PersonOrderEnum orderBy) {
 
         List<Person> result = new ArrayList<>();
         if (searchTerm.matches(pattern)) {
             String term = searchTerm.replaceAll("\\s+", " ");
             String[] array = term.split(" ");
             if (array.length > 1) {
-                result = personDao.searchFirstAndLastName(searchTerm);
+                result = personDao.searchFirstAndLastName(searchTerm, orderBy);
             }
 
             if (result.isEmpty()) {

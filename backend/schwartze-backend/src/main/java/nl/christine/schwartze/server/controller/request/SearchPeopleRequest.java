@@ -8,11 +8,14 @@
 package nl.christine.schwartze.server.controller.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import nl.christine.schwartze.server.controller.enums.PersonOrderEnum;
 
 public class SearchPeopleRequest {
 
     @JsonProperty("search_term")
     private String searchTerm;
+
+    private PersonOrderEnum orderBy;
 
     public String getSearchTerm() {
         return searchTerm;
@@ -20,5 +23,15 @@ public class SearchPeopleRequest {
 
     public void setSearchTerm(String searchTerm) {
         this.searchTerm = searchTerm;
+    }
+
+    public PersonOrderEnum getOrderBy()
+    {
+        return orderBy;
+    }
+
+    public void setOrderBy(PersonOrderEnum orderBy)
+    {
+        this.orderBy = orderBy;
     }
 }

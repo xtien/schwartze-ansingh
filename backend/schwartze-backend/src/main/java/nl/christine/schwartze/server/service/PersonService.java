@@ -7,6 +7,7 @@
 
 package nl.christine.schwartze.server.service;
 
+import nl.christine.schwartze.server.controller.enums.PersonOrderEnum;
 import nl.christine.schwartze.server.controller.request.EditLinkRequest;
 import nl.christine.schwartze.server.controller.result.CombinePersonResult;
 import nl.christine.schwartze.server.controller.result.EditLinkResult;
@@ -45,5 +46,5 @@ public interface PersonService {
 
     EditLinkResult editLink(EditLinkRequest request);
 
-    List<Person> search(String searchTerm);
+    List<Person> search(String searchTerm, PersonOrderEnum orderBy);
 }

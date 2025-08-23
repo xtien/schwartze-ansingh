@@ -244,16 +244,6 @@ function Letters() {
                                 onClick={() => sort(LettersRequestOrderByEnum.Date)}>
                                 {t('op_datum')}
                             </button>
-                            <button
-                                className="btn btn-outline-secondary mybutton m-lg-3 mt-3"
-                                onClick={() => sort(LettersRequestOrderByEnum.SenderLastname)}>
-                                {t('op_achternaam')}
-                            </button>
-                            <button
-                                className="btn btn-outline-secondary mybutton m-lg-3 mt-3"
-                                onClick={() => sort(LettersRequestOrderByEnum.SenderFirstname)}>
-                                {t('op_voornaam')}
-                            </button>
                         </div>
                     }
                 </div>

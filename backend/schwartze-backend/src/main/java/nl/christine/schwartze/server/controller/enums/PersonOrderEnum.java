@@ -8,5 +8,5 @@
 package nl.christine.schwartze.server.controller.enums;
 
 public enum PersonOrderEnum {
-    NAME, NUMBER, FIRST_NAME;
+    LAST_NAME, NUMBER, FIRST_NAME;
 }

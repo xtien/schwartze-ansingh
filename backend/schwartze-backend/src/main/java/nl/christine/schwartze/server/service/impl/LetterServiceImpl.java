@@ -30,12 +30,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component("letterService")
-public class LetterServiceImpl implements LetterService {
+public class LetterServiceImpl implements LetterService
+{
 
     private final Comparator<Letter> compareByDate;
     private final Comparator<Letter> compareByNumber;
-    private final Comparator<Letter> compareByFirstName;
-    private final Comparator<Letter> compareByLastName;
 
     Logger logger = LoggerFactory.getLogger(LetterServiceImpl.class);
 
@@ -51,86 +50,54 @@ public class LetterServiceImpl implements LetterService {
     @Autowired
     private CollectieDao collectieDao;
 
-    public LetterServiceImpl() {
+    public LetterServiceImpl()
+    {
         compareByDate = Comparator
                 .comparing(Letter::getDate, Comparator.nullsFirst(Comparator.naturalOrder()));
         compareByNumber = Comparator
                 .comparing(Letter::getNumber, Comparator.nullsFirst(Comparator.naturalOrder()));
-        compareByFirstName = (o1, o2) -> {
-            if (o1.getSenders() == null || o1.getSenders().isEmpty()) {
-                return 1;
-            }
-            if (o2.getSenders() == null || o2.getSenders().isEmpty()) {
-                return -1;
-            }
-            if (o1.getSenders().get(0).getFirstName() == null) {
-                return 1;
-            }
-            if (o2.getSenders().get(0).getFirstName() == null) {
-                return -1;
-            }
-            if (o1.getSenders().get(0).getFirstName().equals(o2.getSenders().get(0).getFirstName())) {
-                return 0;
-            } else {
-                return o1.getSenders().get(0).getFirstName().compareTo(o2.getSenders().get(0).getFirstName());
-            }
-        };
-        compareByLastName = (o1, o2) -> {
-            if (o1.getSenders() == null || o1.getSenders().isEmpty()) {
-                return 1;
-            }
-            if (o2.getSenders() == null || o2.getSenders().isEmpty()) {
-                return -1;
-            }
-            if (o1.getSenders().get(0).getLastName() == null) {
-                return 1;
-            }
-            if (o2.getSenders().get(0).getLastName() == null) {
-                return -1;
-            }
-            if (o1.getSenders().get(0).getLastName().equals(o2.getSenders().get(0).getLastName())) {
-                return 0;
-            } else {
-                return o1.getSenders().get(0).getLastName().compareTo(o2.getSenders().get(0).getLastName());
-            }
-        };
     }
 
     @Transactional("transactionManager")
     @Override
-    public List<Letter> getLetters(LettersOrderByEnum order) {
-        Comparator<Letter> comparator = selectComparator(order);
-        return Optional.ofNullable(letterDao.getLetters()).orElse(new ArrayList<>()).stream().sorted(comparator).collect(Collectors.toList());
+    public List<Letter> getLetters(LettersOrderByEnum order)
+    {
+        return letterDao.getLetters(order);
     }
 
     @Override
     @Transactional("transactionManager")
-    public List<Letter> getLettersForPerson(int id, LettersOrderByEnum orderBy) {
+    public List<Letter> getLettersForPerson(int id, LettersOrderByEnum orderBy)
+    {
         return personDao.getLettersForPerson(id).stream().sorted(compareByDate).collect(Collectors.toList());
     }
 
     @Override
     @Transactional("transactionManager")
-    public List<Letter> getLettersForLocation(int locationId) {
+    public List<Letter> getLettersForLocation(int locationId)
+    {
         return locationDao.getLettersForLocation(Optional.ofNullable(locationId)).stream().sorted(compareByDate).collect(Collectors.toList());
     }
 
     @Override
     @Transactional("transactionManager")
-    public Text getText(int id) {
+    public Text getText(int id)
+    {
         return letterDao.getText(id);
     }
 
 
     @Override
     @Transactional("transactionManager")
-    public Letter getLetterById(Integer letterId) {
+    public Letter getLetterById(Integer letterId)
+    {
         return letterDao.getLetterForId(letterId);
     }
 
     @Override
     @Transactional("transactionManager")
-    public Letter updateLetter(Letter letter) {
+    public Letter updateLetter(Letter letter)
+    {
 
         Letter existingLetter = letterDao.getLetterForNumber(letter.getNumber());
         if (existingLetter != null) {
@@ -159,7 +126,10 @@ public class LetterServiceImpl implements LetterService {
      * @param existingLocations
      * @param newLocations
      */
-    private void updateLocations(List<MyLocation> existingLocations, List<MyLocation> newLocations, Letter existingLetter) {
+    private void updateLocations(List<MyLocation> existingLocations,
+            List<MyLocation> newLocations,
+            Letter existingLetter)
+    {
         List<MyLocation> toRemove = new ArrayList<>();
         List<MyLocation> toAdd = new ArrayList<>();
 
@@ -193,7 +163,8 @@ public class LetterServiceImpl implements LetterService {
      *
      * @param existingPeople
      */
-    private void updateSendersRecipients(List<Person> existingPeople, List<Person> newPeople, Letter existingLetter) {
+    private void updateSendersRecipients(List<Person> existingPeople, List<Person> newPeople, Letter existingLetter)
+    {
         if (!CollectionUtils.isEmpty(newPeople)) {
             List<Person> toAdd = new ArrayList<>();
             List<Person> toRemove = new ArrayList<>();
@@ -225,7 +196,8 @@ public class LetterServiceImpl implements LetterService {
 
     @Override
     @Transactional("transactionManager")
-    public Letter addLetter(Letter letter) {
+    public Letter addLetter(Letter letter)
+    {
 
         Letter existingLetter = letterDao.getLetterForNumber(letter.getNumber());
         if (existingLetter != null) {
@@ -241,7 +213,8 @@ public class LetterServiceImpl implements LetterService {
         for (Person person : letter.getRecipients()) {
             if (person.getId() == 0) {
                 personDao.persist(person);
-            } else {
+            }
+            else {
                 Person existingPerson = personDao.getPerson(person.getId());
                 existingPerson.addLetterReceived(letter);
                 toAdd.add(existingPerson);
@@ -257,7 +230,8 @@ public class LetterServiceImpl implements LetterService {
         for (Person person : letter.getSenders()) {
             if (person.getId() == 0) {
                 personDao.persist(person);
-            } else {
+            }
+            else {
                 Person existingPerson = personDao.getPerson(person.getId());
                 existingPerson.addLetterWritten(letter);
                 toAdd.add(existingPerson);
@@ -274,7 +248,8 @@ public class LetterServiceImpl implements LetterService {
         for (MyLocation location : letter.getFromLocations()) {
             if (location.getId() == 0) {
                 locationDao.persist(location);
-            } else {
+            }
+            else {
                 MyLocation existingLocation = locationDao.getLocation(location.getId());
                 existingLocation.addLetterFrom(letter);
                 locationAdd.add(existingLocation);
@@ -291,7 +266,8 @@ public class LetterServiceImpl implements LetterService {
         for (MyLocation location : letter.getToLocations()) {
             if (location.getId() == 0) {
                 locationDao.persist(location);
-            } else {
+            }
+            else {
                 MyLocation existingLocation = locationDao.getLocation(location.getId());
                 existingLocation.addLetterTo(letter);
                 locationAdd.add(existingLocation);
@@ -307,7 +283,9 @@ public class LetterServiceImpl implements LetterService {
 
     @Override
     @Transactional("transactionManager")
-    public void deleteLetter(Letter letter) throws LetterNotFoundException {
+    public void deleteLetter(Letter letter)
+    throws LetterNotFoundException
+    {
         letterDao.deleteLetter(letter);
     }
 
@@ -319,7 +297,8 @@ public class LetterServiceImpl implements LetterService {
      */
     @Override
     @Transactional("transactionManager")
-    public int persist(ImportLetter importLetter) {
+    public int persist(ImportLetter importLetter)
+    {
 
         int result = 0;
 
@@ -369,7 +348,8 @@ public class LetterServiceImpl implements LetterService {
 
     @Override
     @Transactional("transactionManager")
-    public void persistIfNotPresent(ImportLetter importLetter) {
+    public void persistIfNotPresent(ImportLetter importLetter)
+    {
 
         Letter existingLetter = letterDao.getLetterForNumber(importLetter.getNumber());
         if (existingLetter == null) {
@@ -379,35 +359,41 @@ public class LetterServiceImpl implements LetterService {
 
     @Override
     @Transactional("transactionManager")
-    public Letter getLetterByNumber(int letterNumber) {
+    public Letter getLetterByNumber(int letterNumber)
+    {
         return letterDao.getLetterForNumber(letterNumber);
     }
 
     @Override
     @Transactional("transactionManager")
-    public Letter getNextLetter(int letterNumber) {
+    public Letter getNextLetter(int letterNumber)
+    {
         return letterDao.getNextLetter(letterNumber);
     }
 
     @Override
     @Transactional("transactionManager")
-    public Letter getPreviousLetter(int letterNumber) {
+    public Letter getPreviousLetter(int letterNumber)
+    {
         return letterDao.getPreviousLetter(letterNumber);
     }
 
     @Override
     @Transactional("transactionManager")
-    public Letter updateLetterComment(int letterNumber, String text, String date) {
+    public Letter updateLetterComment(int letterNumber, String text, String date)
+    {
         Letter letter = null;
         try {
             letter = letterDao.updateLetterComment(letterNumber, text, date);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             logger.error("Error updating letter comments", e);
         }
         return letter;
     }
 
-    private MyLocation doLocation(String location) {
+    private MyLocation doLocation(String location)
+    {
         MyLocation fromLocation = createLocation(location);
         MyLocation existingLocation = locationDao.getLocationByName(fromLocation);
         if (existingLocation == null) {
@@ -416,7 +402,8 @@ public class LetterServiceImpl implements LetterService {
         return existingLocation;
     }
 
-    private Person doPerson(String fromPersonString) {
+    private Person doPerson(String fromPersonString)
+    {
         Person fromPerson = createPerson(fromPersonString);
         Person existingPerson = personDao.getPersonByName(fromPerson);
         if (existingPerson == null) {
@@ -425,12 +412,14 @@ public class LetterServiceImpl implements LetterService {
         return existingPerson;
     }
 
-    private MyLocation createLocation(String fromLocation) {
+    private MyLocation createLocation(String fromLocation)
+    {
         fromLocation = fromLocation.replace("  ", " ").trim();
         return new MyLocation(fromLocation);
     }
 
-    private Person createPerson(String importPerson) {
+    private Person createPerson(String importPerson)
+    {
 
         importPerson = importPerson.replace("  ", " ").trim();
         Person person = new Person();
@@ -452,17 +441,12 @@ public class LetterServiceImpl implements LetterService {
         return person;
     }
 
-    private Comparator<Letter> selectComparator(LettersOrderByEnum order) {
+    private Comparator<Letter> selectComparator(LettersOrderByEnum order)
+    {
         Comparator<Letter> comparator;
         switch (order) {
             case DATE -> {
                 comparator = compareByDate;
-            }
-            case SENDER_FIRSTNAME -> {
-                comparator = compareByFirstName;
-            }
-            case SENDER_LASTNAME -> {
-                comparator = compareByLastName;
             }
             default -> comparator = compareByNumber;
         }

@@ -25,6 +25,21 @@ export interface SearchPeopleRequest {
      * @type {string}
      * @memberof SearchPeopleRequest
      */
+    'orderBy'?: SearchPeopleRequestOrderByEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof SearchPeopleRequest
+     */
     'search_term'?: string;
 }
+
+export const SearchPeopleRequestOrderByEnum = {
+    LastName: 'LAST_NAME',
+    Number: 'NUMBER',
+    FirstName: 'FIRST_NAME'
+} as const;
+
+export type SearchPeopleRequestOrderByEnum = typeof SearchPeopleRequestOrderByEnum[keyof typeof SearchPeopleRequestOrderByEnum];
+
 

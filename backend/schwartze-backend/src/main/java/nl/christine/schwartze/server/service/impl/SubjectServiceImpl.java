@@ -11,6 +11,7 @@ import com.deepl.api.DeepLException;
 import nl.christine.schwartze.server.dao.SubjectDao;
 import nl.christine.schwartze.server.model.Subject;
 import nl.christine.schwartze.server.model.Text;
+import nl.christine.schwartze.server.model.Title;
 import nl.christine.schwartze.server.service.SubjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,18 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     @Transactional("transactionManager")
     public List<Subject> getSubjects(String language) throws DeepLException, InterruptedException {
-        return subjectDao.getSubjects();
+        List<Subject> subjects = subjectDao.getSubjects();
+
+        subjects.stream().forEach(s -> {
+            try {
+                convertSubjectTextForLanguage(s, language);
+            } catch (DeepLException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        return subjects;
     }
 
     @Override
@@ -69,18 +81,6 @@ public class SubjectServiceImpl implements SubjectService {
     @Transactional("transactionManager")
     public void removeSubject(Integer id) {
         subjectDao.remove(id);
-    }
-
-    private List<Subject> convertText(List<Subject> subjects, String language) throws DeepLException, InterruptedException {
-        return subjects.stream().map(s -> {
-            try {
-                return convertSubjectTextForLanguage(s, language);
-            } catch (DeepLException e) {
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }).collect(Collectors.toList());
     }
 
     private Subject convertSubjectTextForLanguage(Subject s, String language) throws DeepLException, InterruptedException {

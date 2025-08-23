@@ -52,12 +52,12 @@ function People() {
         })
     }
 
-    function handleSearchTermChange() {
-        setSearchTerm(search_term);
+    function handleSearchTermChange(event: { target: { value: string }; }) {
+        setSearchTerm(event.target.value);
     }
 
-    function handleSearchSubmit() {
-
+    function handleSearchSubmit(event: { preventDefault: () => void; }) {
+        event.preventDefault();
         const postData: SearchRequest = {
             search_term: search_term
         }
@@ -113,7 +113,7 @@ function People() {
                     </button>
                     <button
                         className="btn btn-outline-secondary mybutton mt-5 m-lg-2"
-                        onClick={() => sort(PeopleRequestOrderByEnum.Name)}>
+                        onClick={() => sort(PeopleRequestOrderByEnum.LastName)}>
                         {t('op_achternaam')}
                     </button>
                     <button
