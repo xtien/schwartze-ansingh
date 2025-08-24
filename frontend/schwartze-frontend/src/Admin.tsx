@@ -11,6 +11,7 @@ import {apiConfig} from "./service/AuthenticationService.tsx";
 import {AdminLuceneApi, UserApi} from "./generated-api";
 import {useNavigate} from "react-router";
 import {useTranslation} from "react-i18next";
+import i18next from "i18next";
 
 const userApi = new UserApi(apiConfig)
 const indexApi = new AdminLuceneApi(apiConfig)
@@ -26,7 +27,7 @@ function Admin() {
 
         setIndexing(true)
 
-        indexApi.createIndex().then(() => {
+        indexApi.createIndex(i18next.language).then(() => {
             setIndexing(false)
         }).catch(
             error => {

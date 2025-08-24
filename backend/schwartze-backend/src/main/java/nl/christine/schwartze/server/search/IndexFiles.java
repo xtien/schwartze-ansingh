@@ -8,5 +8,6 @@
 package nl.christine.schwartze.server.search;
 
 public interface IndexFiles {
-    int indexFiles();
+
+    int indexFiles(String language);
 }

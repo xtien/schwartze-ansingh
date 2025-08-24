@@ -36,7 +36,7 @@ public class LuceneSearchController {
         SearchResult result = new SearchResult();
         if (request.getSearchTerm().matches(PATTERN)) {
             try {
-                result.setLetters(searchFiles.search(request.getSearchTerm()));
+                result.setLetters(searchFiles.search(request.getSearchTerm(), request.getLanguage(), request.isFuzzy()));
                 result.setNumberOfResults(result.getLetters().size());
             } catch (Exception e) {
                 logger.error(e.getMessage());

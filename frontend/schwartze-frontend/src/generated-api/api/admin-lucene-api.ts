@@ -31,11 +31,15 @@ export const AdminLuceneApiAxiosParamCreator = function (configuration?: Configu
     return {
         /**
          * 
+         * @param {string} language 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createIndex: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/admin/createIndex/`;
+        createIndex: async (language: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'language' is not null or undefined
+            assertParamExists('createIndex', 'language', language)
+            const localVarPath = `/admin/createIndex/{language}`
+                .replace(`{${"language"}}`, encodeURIComponent(String(language)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -70,11 +74,12 @@ export const AdminLuceneApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @param {string} language 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createIndex(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IndexResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createIndex(options);
+        async createIndex(language: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IndexResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createIndex(language, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AdminLuceneApi.createIndex']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -91,11 +96,12 @@ export const AdminLuceneApiFactory = function (configuration?: Configuration, ba
     return {
         /**
          * 
+         * @param {string} language 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createIndex(options?: RawAxiosRequestConfig): AxiosPromise<IndexResult> {
-            return localVarFp.createIndex(options).then((request) => request(axios, basePath));
+        createIndex(language: string, options?: RawAxiosRequestConfig): AxiosPromise<IndexResult> {
+            return localVarFp.createIndex(language, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -109,12 +115,13 @@ export const AdminLuceneApiFactory = function (configuration?: Configuration, ba
 export class AdminLuceneApi extends BaseAPI {
     /**
      * 
+     * @param {string} language 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AdminLuceneApi
      */
-    public createIndex(options?: RawAxiosRequestConfig) {
-        return AdminLuceneApiFp(this.configuration).createIndex(options).then((request) => request(this.axios, this.basePath));
+    public createIndex(language: string, options?: RawAxiosRequestConfig) {
+        return AdminLuceneApiFp(this.configuration).createIndex(language, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

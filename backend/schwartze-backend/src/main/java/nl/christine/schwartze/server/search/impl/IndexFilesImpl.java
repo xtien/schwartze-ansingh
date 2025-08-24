@@ -20,9 +20,11 @@ import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -35,38 +37,49 @@ import java.nio.file.attribute.BasicFileAttributes;
  * https://howtodoinjava.com/lucene/lucene-index-and-search-text-files/
  */
 @Component("indexFiles")
-public class IndexFilesImpl implements IndexFiles {
+public class IndexFilesImpl implements IndexFiles
+{
 
     Logger logger = LoggerFactory.getLogger(IndexFilesImpl.class);
+
+    @Value("${defaultlanguage}")
+    private String defaultLanguage;
 
     @Autowired
     private SchwartzeProperties properties;
 
-    private String lettersDirectory;
+    private String baseLettersDirectory;
     private String textDocumentName;
 
     String indexPath;
     Path docDir;
 
     @PostConstruct
-    public void init() {
-        lettersDirectory = properties.getProperty("letters_directory");
+    public void init()
+    {
+        baseLettersDirectory = properties.getProperty("letters_directory");
         textDocumentName = properties.getProperty("text_document_name");
-        docDir = Paths.get(lettersDirectory);
         indexPath = properties.getProperty("index_directory");
-
-        File indexDir = new File(indexPath);
-        if(!indexDir.exists()){
-            indexDir.mkdir();
-        }
     }
 
     @Override
-    public int indexFiles() {
-
+    public int indexFiles(String language)
+    {
+        String lettersDirectory;
+         if (language != null && !language.equals(defaultLanguage)) {
+            lettersDirectory = baseLettersDirectory + "/" + language;
+         } else {
+             lettersDirectory = baseLettersDirectory;
+         }
+        String indexDir = lettersDirectory + "/" + indexPath;
+        docDir = Paths.get(lettersDirectory);
+        File f = new File(indexDir);
+        if (!f.exists()) {
+            f.mkdir();
+        }
         int count = 0;
 
-        try (Directory dir = FSDirectory.open(Paths.get(indexPath))){
+        try (Directory dir = FSDirectory.open(Paths.get(indexDir))) {
 
             Analyzer analyzer = new StandardAnalyzer();
             IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
@@ -75,25 +88,28 @@ public class IndexFilesImpl implements IndexFiles {
             count = indexDocs(writer, docDir);
             writer.close();
 
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
 
         return count;
     }
 
-    private int indexDocs(final IndexWriter writer, Path path) throws IOException {
+    private int indexDocs(final IndexWriter writer, Path path)
+    throws IOException
+    {
 
         int count = 0;
         try (DirectoryStream<Path> ds = Files.newDirectoryStream(path, filter())) {
 
             for (Path p : ds) {
 
-                if(p.endsWith("701")){
+                if (p.endsWith("701")) {
                     logger.info("ok");
                 }
 
-                Path textFile = Paths.get(p.toString() + "/" + textDocumentName);
+                Path textFile = Paths.get(p + "/" + textDocumentName);
 
                 if (textFile != null && Files.exists(textFile)) {
                     BasicFileAttributes attrs = Files.readAttributes(p, BasicFileAttributes.class);
@@ -103,14 +119,17 @@ public class IndexFilesImpl implements IndexFiles {
                 }
             }
             logger.info(count + " entries read");
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             logger.error(ex.getMessage(), ex);
         }
 
         return count;
     }
 
-    private void indexDoc(IndexWriter writer, Path file, long lastModified) throws IOException {
+    private void indexDoc(IndexWriter writer, Path file, long lastModified)
+    throws IOException
+    {
 
         Document doc = new Document();
         doc.add(new StringField("path", file.toString(), Field.Store.YES));
@@ -120,7 +139,8 @@ public class IndexFilesImpl implements IndexFiles {
         writer.updateDocument(new Term("path", file.toString()), doc);
     }
 
-    private DirectoryStream.Filter<Path> filter() {
+    private DirectoryStream.Filter<Path> filter()
+    {
         return entry -> Files.isDirectory(entry);
     }
 }

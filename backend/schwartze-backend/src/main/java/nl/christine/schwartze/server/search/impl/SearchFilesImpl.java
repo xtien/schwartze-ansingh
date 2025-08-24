@@ -17,7 +17,9 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.StoredFields;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -25,10 +27,11 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
-import java.io.IOException;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -37,9 +40,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component("searchFiles")
-public class SearchFilesImpl implements SearchFiles {
+public class SearchFilesImpl implements SearchFiles
+{
 
     private final Comparator<Letter> compareByDate;
+
+    @Value("${defaultlanguage}")
+    private String defaultLanguage;
 
     @Autowired
     private SchwartzeProperties properties;
@@ -47,34 +54,50 @@ public class SearchFilesImpl implements SearchFiles {
     @Autowired
     private LetterDao letterDao;
 
-    private String lettersDirectory;
+    private String baseLettersDirectory;
 
     String indexPath;
     private String textDocumentName;
-    Path docDir;
 
-    public SearchFilesImpl() {
+    public SearchFilesImpl()
+    {
         compareByDate = Comparator
                 .comparing(Letter::getDate, Comparator.nullsFirst(Comparator.naturalOrder()));
     }
 
     @PostConstruct
-    public void init() {
-
-        lettersDirectory = properties.getProperty("letters_directory");
-        docDir = Paths.get(lettersDirectory);
-        indexPath = lettersDirectory + "/indexedFiles";
+    public void init()
+    {
+        baseLettersDirectory = properties.getProperty("letters_directory");
+        indexPath = properties.getProperty("index_directory");
         textDocumentName = properties.getProperty("text_document_name");
     }
 
     @Override
-    public List<Letter> search(String searchTerm) throws Exception {
+    public List<Letter> search(String searchTerm, String language, boolean fuzzy)
+    throws Exception
+    {
+        String lettersDirectory;
+        if (language != null && !language.equals(defaultLanguage)) {
+            lettersDirectory = baseLettersDirectory + "/" + language;
+        } else {
+            lettersDirectory = baseLettersDirectory;
+        }
+        String indexDir = lettersDirectory + "/" + indexPath;
 
-        Directory dir = FSDirectory.open(Paths.get(indexPath));
+        Directory dir = FSDirectory.open(Paths.get(indexDir));
         IndexReader reader = DirectoryReader.open(dir);
         IndexSearcher searcher = new IndexSearcher(reader);
+        TopDocs foundDocs;
+        if (fuzzy) {
+            Term term = new Term("letters", searchTerm);
+            Query fuzzyQuery = new FuzzyQuery(term);
+            foundDocs = searcher.search(fuzzyQuery, 2);
+        }
+        else {
+            foundDocs = searchInContent(searchTerm, searcher);
+        }
 
-        TopDocs foundDocs = searchInContent(searchTerm, searcher);
         StoredFields storedFields = reader.storedFields();
         List<Document> documents = new ArrayList<>();
         for (ScoreDoc scoreDoc : foundDocs.scoreDocs) {
@@ -83,9 +106,9 @@ public class SearchFilesImpl implements SearchFiles {
         return documents.stream().map(doc -> getLetter(doc)).sorted(compareByDate).collect(Collectors.toList());
     }
 
-    private Letter getLetter(Document doc) {
-
-        String documentNumber = doc.getField("path").stringValue().replace(lettersDirectory, "").replace(textDocumentName, "").replace("/", "");
+    private Letter getLetter(Document doc)
+    {
+        String documentNumber = doc.getField("path").stringValue().replace(baseLettersDirectory, "").replace(textDocumentName, "").replace("/", "");
 
         if (NumberUtils.isCreatable(documentNumber)) {
             return letterDao.getLetterForNumber(Integer.parseInt(documentNumber));
@@ -93,15 +116,11 @@ public class SearchFilesImpl implements SearchFiles {
         return new Letter();
     }
 
-    private TopDocs searchInContent(String textToFind, IndexSearcher searcher) throws Exception {
+    private TopDocs searchInContent(String textToFind, IndexSearcher searcher)
+    throws Exception
+    {
         QueryParser qp = new QueryParser("contents", new StandardAnalyzer());
         Query query = qp.parse(textToFind);
         return searcher.search(query, 10);
-    }
-
-    private IndexSearcher createSearcher() throws IOException {
-        Directory dir = FSDirectory.open(Paths.get(indexPath));
-        IndexReader reader = DirectoryReader.open(dir);
-        return new IndexSearcher(reader);
     }
 }

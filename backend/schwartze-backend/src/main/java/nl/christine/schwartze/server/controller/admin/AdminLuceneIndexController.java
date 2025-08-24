@@ -13,6 +13,7 @@ import nl.christine.schwartze.server.search.IndexFiles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,12 +26,12 @@ public class AdminLuceneIndexController {
     @Autowired
     private IndexFiles indexFiles;
 
-    @PostMapping(value = "/createIndex/")
-    public ResponseEntity<IndexResult> createIndex() {
+    @PostMapping(value = "/createIndex/{language}")
+    public ResponseEntity<IndexResult> createIndex(@PathVariable String language) {
 
         IndexResult result = new IndexResult();
 
-        result.setNumberIndexed(indexFiles.indexFiles());
+        result.setNumberIndexed(indexFiles.indexFiles(language));
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

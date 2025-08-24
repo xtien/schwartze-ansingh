@@ -25,6 +25,18 @@ export interface SearchRequest {
      * @type {string}
      * @memberof SearchRequest
      */
+    'language'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof SearchRequest
+     */
+    'fuzzy'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof SearchRequest
+     */
     'search_term'?: string;
 }
 

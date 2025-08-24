@@ -31,6 +31,7 @@ import {apiConfig} from "./service/AuthenticationService.tsx";
 import type {AxiosResponse} from "axios";
 import ReactGA from "react-ga4";
 import {useTranslation} from "react-i18next";
+import i18next from "i18next";
 
 const lettersApi = new LettersApi(apiConfig);
 const personApi = new PersonApi(apiConfig);
@@ -61,6 +62,7 @@ function Letters() {
     const [orderBy, setOrderBy] = React.useState<LettersRequestOrderByEnum>("NUMBER");
     const [toFrom] = React.useState<LettersRequestToFromEnum>(toFromString === 'to' ? LettersRequestToFromEnum.To : LettersRequestToFromEnum.From);
     const [search_term, setSearchTerm] = React.useState('');
+    const [fuzzy, setFuzzy] = React.useState(false);
 
     function getLetters(orderBy: LettersRequestOrderByEnum) {
         if (isPerson) {
@@ -117,6 +119,8 @@ function Letters() {
         } else if (isSearch) {
             let postData: SearchRequest = {
                 search_term: searchTerm,
+                language: i18next.language,
+                fuzzy: fuzzy
             };
 
             searchApi.searchLetters(postData).then((response) => {
@@ -222,58 +226,79 @@ function Letters() {
         });
     }
 
+    function handleFuzzy() {
+        setFuzzy(!fuzzy)
+    }
+
     return (
         <div className='container-fluid me-sm-5 ms-sm-5'>
-            <div className="row">
+            <div>
                 {person != null || myLocation != null ?
                     <div className='mt-3 m-lg-5'>
                         {person != null ? (strings.personLettersText + " " + (toFrom === PersonLettersRequestToFromEnum.From ? strings.from : strings.to) + ' ' + createFullName(person)) : ''}
                         {myLocation != null ? (strings.locationLettersText + ' ' + myLocation.name) : ''}
                     </div> : null}
 
-                <div className='d-none d-lg-block'>
+                <div className='d-none d-lg-block mt-3'>
                     {letters.length < 10 ? null :
-                        <div className='col-sm-7'>
-                            <button
-                                className="btn btn-outline-secondary mybutton m-lg-3  mt-3"
-                                onClick={() => sort(LettersRequestOrderByEnum.Number)}>
-                                {t('op_nummer')}
-                            </button>
-                            <button
-                                className="btn btn-outline-secondary mybutton m-lg-3  mt-3"
-                                onClick={() => sort(LettersRequestOrderByEnum.Date)}>
-                                {t('op_datum')}
-                            </button>
+                        <div className='row'>
+                            <div className='col-sm-2'>
+                                <button
+                                    className="btn btn-outline-secondary mybutton   "
+                                    onClick={() => sort(LettersRequestOrderByEnum.Number)}>
+                                    {t('op_nummer')}
+                                </button>
+                            </div>
+                            <div className='col-sm-2'>
+                                <button
+                                    className="btn btn-outline-secondary mybutton  "
+                                    onClick={() => sort(LettersRequestOrderByEnum.Date)}>
+                                    {t('op_datum')}
+                                </button>
+                            </div>
+                            <div className='col-sm-4'>
+                                <form onSubmit={handleSearchSubmit} className='mb-3 '>
+                                    <input
+                                        type="input"
+                                        id="text"
+                                        placeholder={t('search')}
+                                        onChange={handleSearchTermChange}
+                                        className='form-control w-75'
+                                    />
+                                </form>
+                            </div>
+                            <div className='col-sm-4'>
+                                <div className='d-flex flex-row me-3 mt-2'>
+                                    <div className='me-3'>
+                                        {t('fuzzy-search')}</div>
+                                    <input
+                                        type="checkbox"
+                                        onChange={handleFuzzy}
+
+                                    />
+                                </div>
+                            </div>
                         </div>
                     }
                 </div>
 
-                <div className='col-sm-5'>
-                    <form onSubmit={handleSearchSubmit} className='mb-3 mt-3'>
-                        <input
-                            type="input"
-                            id="text"
-                            placeholder={t('search')}
-                            onChange={handleSearchTermChange}
-                            className='form-control w-75'
-                        />
-                    </form>
+                <div className='mt-5'>
+                    <Table>
+                        <thead>
+                        <tr>
+                            <th className='d-none d-lg-block'>{t('number')}</th>
+                            <th>{t('date')}</th>
+                            <th>{t('sender')}</th>
+                            <th className='d-none d-lg-block'>{t('senderLocation')}</th>
+                            <th>{t('recipient')}</th>
+                            <th className='d-none d-lg-block'>{t('recipientLocation')}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {renderLetters()}
+                        </tbody>
+                    </Table>
                 </div>
-                <Table>
-                    <thead>
-                    <tr>
-                        <th className='d-none d-lg-block'>{t('number')}</th>
-                        <th>{t('date')}</th>
-                        <th>{t('sender')}</th>
-                        <th className='d-none d-lg-block'>{t('senderLocation')}</th>
-                        <th>{t('recipient')}</th>
-                        <th className='d-none d-lg-block'>{t('recipientLocation')}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {renderLetters()}
-                    </tbody>
-                </Table>
             </div>
         </div>
     )

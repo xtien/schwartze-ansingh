@@ -90,5 +90,6 @@
   "link_url": "Link URL",
   "translateLetter": "Translate letter",
   "number": "Number",
-  "comments": "Remarks"
+  "comments": "Remarks",
+  "fuzzy-search": "Fuzzy Search"
 }

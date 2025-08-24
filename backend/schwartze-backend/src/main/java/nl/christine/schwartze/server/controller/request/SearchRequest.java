@@ -14,11 +14,37 @@ public class SearchRequest {
     @JsonProperty("search_term")
     private String searchTerm;
 
-    public String getSearchTerm() {
+  //  @JsonProperty("language")
+    private String language;
+
+    private boolean fuzzy;
+
+    public String getSearchTerm()
+    {
         return searchTerm;
     }
 
     public void setSearchTerm(String searchTerm) {
         this.searchTerm = searchTerm;
+    }
+
+    public boolean isFuzzy()
+    {
+        return fuzzy;
+    }
+
+    public void setFuzzy(boolean fuzzy)
+    {
+        this.fuzzy = fuzzy;
+    }
+
+    public String getLanguage()
+    {
+        return language;
+    }
+
+    public void setLanguage(String language)
+    {
+        this.language = language;
     }
 }
