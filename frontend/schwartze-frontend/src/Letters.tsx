@@ -40,16 +40,17 @@ const searchApi = new LuceneSearchApi(apiConfig)
 function Letters() {
     const {t} = useTranslation();
 
-    useEffect(() => {
+     useEffect(() => {
         // Send pageview with a custom path
         ReactGA.send({hitType: "pageview", page: "/get_letters", title: "Letters Page"});
-    }, [])
+    }, )
 
     const location = useLocation()
     const params = location.pathname.substring(1).split('/')
     const id = params[1]
     const searchTerm = params[1]
     const urlPart = params[0]
+    const fuzzy = params[2] === 'true' ? true : false
     const isPerson: boolean = urlPart.includes('person') ? true : false
     const isLocation: boolean = urlPart.includes('location') ? true : false
     const isSearch: boolean = urlPart.includes('search_letters') ? true : false
@@ -62,7 +63,7 @@ function Letters() {
     const [orderBy, setOrderBy] = React.useState<LettersRequestOrderByEnum>("NUMBER");
     const [toFrom] = React.useState<LettersRequestToFromEnum>(toFromString === 'to' ? LettersRequestToFromEnum.To : LettersRequestToFromEnum.From);
     const [search_term, setSearchTerm] = React.useState('');
-    const [fuzzy, setFuzzy] = React.useState(false);
+    const [fuzzy_, setFuzzy] = React.useState(false);
 
     function getLetters(orderBy: LettersRequestOrderByEnum) {
         if (isPerson) {
@@ -117,19 +118,20 @@ function Letters() {
             getLocation(id)
 
         } else if (isSearch) {
-            let postData: SearchRequest = {
+            let searchRequest: SearchRequest = {
                 search_term: searchTerm,
-                language: i18next.language,
-                fuzzy: fuzzy
+                fuzzy: fuzzy,
+                language: i18next.language
             };
 
-            searchApi.searchLetters(postData).then((response) => {
-                if (response.data.letters != null) {
-                    setLetters(response.data.letters)
-                }
-            }).catch((error) => {
-                console.log(error)
-            })
+                searchApi.searchLetters(searchRequest).then((response) => {
+                    if (response.data.letters != null) {
+                        setLetters(response.data.letters)
+                    }
+                }).catch((error) => {
+                    console.log(error)
+                })
+
         } else {
             const request: LettersRequest = {
                 orderBy: orderBy
@@ -142,7 +144,6 @@ function Letters() {
                 console.log(error)
             })
         }
-
     }
 
     React.useEffect(() => {
@@ -162,7 +163,7 @@ function Letters() {
     }
 
     function handleSearchSubmit() {
-        navigate('/search_letters/' + search_term)
+        navigate('/search_letters/' + search_term + '/'+(fuzzy_ ? 'true' : 'false'));
     }
 
     function navigateTo(location: string) {
@@ -227,7 +228,7 @@ function Letters() {
     }
 
     function handleFuzzy() {
-        setFuzzy(!fuzzy)
+        setFuzzy(!fuzzy_)
     }
 
     return (
@@ -267,17 +268,17 @@ function Letters() {
                                     />
                                 </form>
                             </div>
-                            <div className='col-sm-4'>
-                                <div className='d-flex flex-row me-3 mt-2'>
-                                    <div className='me-3'>
-                                        {t('fuzzy-search')}</div>
-                                    <input
-                                        type="checkbox"
-                                        onChange={handleFuzzy}
+                            {/*<div className='col-sm-4'>*/}
+                            {/*    <div className='d-flex flex-row me-3 mt-2'>*/}
+                            {/*        <div className='me-3'>*/}
+                            {/*            {t('fuzzy-search')}</div>*/}
+                            {/*        <input*/}
+                            {/*            type="checkbox"*/}
+                            {/*            onChange={handleFuzzy}*/}
 
-                                    />
-                                </div>
-                            </div>
+                            {/*        />*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
                         </div>
                     }
                 </div>

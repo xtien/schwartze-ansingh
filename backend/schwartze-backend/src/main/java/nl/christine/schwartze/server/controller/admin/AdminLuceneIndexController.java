@@ -31,7 +31,7 @@ public class AdminLuceneIndexController {
 
         IndexResult result = new IndexResult();
 
-        result.setNumberIndexed(indexFiles.indexFiles(language));
+        result.setNumberIndexed(indexFiles.indexFiles());
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

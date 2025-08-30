@@ -10,8 +10,6 @@ package nl.christine.schwartze.server.service.impl;
 import nl.christine.schwartze.server.service.TextProcessor;
 import org.springframework.stereotype.Component;
 
-//            <p className="navbar-nav"><Link to='/get_letters/0'>Brieven</Link></p>
-
 @Component("textProcessor")
 public class TextProcessorImpl implements TextProcessor {
 

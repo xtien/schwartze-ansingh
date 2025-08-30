@@ -49,7 +49,7 @@ function DeleteLetter() {
 
     const handleClose = () => {
         setShowDialog(false);
-        navigate('/get_letters/0')
+        navigate('/get_letters/')
     }
 
      let postData: LetterRequest = {

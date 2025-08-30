@@ -117,7 +117,7 @@ function App() {
                                 </td>
                                 <td>
                                     <p className='navbar-nav textStyle'>
-                                        <Link to='/get_letters/0' className='linkStyle'>{t('letters')}</Link>
+                                        <Link to='/get_letters' className='linkStyle'>{t('letters')}</Link>
                                     </p>
                                 </td>
                                 <td>
@@ -198,7 +198,7 @@ function App() {
                                         <Link to='/' className='linkStyle'>{t('home')}</Link>
                                     </p>
                                     <p className='navbar-nav textStyle'>
-                                        <Link to='/get_letters/0' className='linkStyle'>{t('letters')}</Link>
+                                        <Link to='/get_letters' className='linkStyle'>{t('letters')}</Link>
                                     </p>
                                     <p className='navbar-nav textStyle'>
                                         <Link to='/get_people/' className='linkStyle'>{t('people')}</Link>
@@ -245,7 +245,8 @@ function App() {
                     <Route path="/admin/" element={<Admin/>}/>
                     <Route path="/login/" element={<Login/>}/>
                     {/*<Route path="/signup/" element={<Signup/>}/>*/}
-                    <Route path="/get_letters/:page" element={<Letters/>}/>
+                    <Route path="/get_letters/" element={<Letters/>}/>
+                    <Route path="/search_letters/:searchTerm/:fuzzy" element={<Letters/>}/>
                     <Route path="/add_person/" element={<AddPerson/>}/>
                     <Route path="/add_letter/" element={<AddLetter/>}/>
                     <Route path="/edit_letter/:number" element={<EditLetter/>}/>
@@ -265,7 +266,6 @@ function App() {
                     <Route path="/get_people/" element={<People/>}/>
                     <Route path="/references/" element={<ReferencesPage/>}/>
                     <Route path="/topics/" element={<Topics/>}/>
-                    <Route path="/search_letters/:search_term" element={<Letters/>}/>
                     <Route path="/get_content/" element={<Content/>}/>
                     <Route path="/about/" element={<About/>}/>
                 </Routes>

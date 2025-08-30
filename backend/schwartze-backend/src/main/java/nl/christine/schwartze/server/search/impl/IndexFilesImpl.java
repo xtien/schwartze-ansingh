@@ -44,6 +44,8 @@ public class IndexFilesImpl implements IndexFiles
 
     @Value("${defaultlanguage}")
     private String defaultLanguage;
+    @Value("${languages}")
+    private String[] languages;
 
     @Autowired
     private SchwartzeProperties properties;
@@ -63,21 +65,30 @@ public class IndexFilesImpl implements IndexFiles
     }
 
     @Override
-    public int indexFiles(String language)
+    public int indexFiles()
+    {
+        int count = 0;
+        for(String lang : languages){
+           count = indexFile(lang, count);
+        }
+        return count;
+    }
+
+    private int indexFile(String language, int count)
     {
         String lettersDirectory;
-         if (language != null && !language.equals(defaultLanguage)) {
+        if (language != null && !language.equals(defaultLanguage)) {
             lettersDirectory = baseLettersDirectory + "/" + language;
-         } else {
-             lettersDirectory = baseLettersDirectory;
-         }
-        String indexDir = lettersDirectory + "/" + indexPath;
+        }
+        else {
+            lettersDirectory = baseLettersDirectory;
+        }
+        String indexDir = baseLettersDirectory + "/" + indexPath;
         docDir = Paths.get(lettersDirectory);
         File f = new File(indexDir);
         if (!f.exists()) {
             f.mkdir();
         }
-        int count = 0;
 
         try (Directory dir = FSDirectory.open(Paths.get(indexDir))) {
 
@@ -85,7 +96,7 @@ public class IndexFilesImpl implements IndexFiles
             IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
             iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
             IndexWriter writer = new IndexWriter(dir, iwc);
-            count = indexDocs(writer, docDir);
+            count = count + indexDocs(writer, docDir);
             writer.close();
 
         }

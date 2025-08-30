@@ -55,6 +55,7 @@ public class SearchFilesImpl implements SearchFiles
     private LetterDao letterDao;
 
     private String baseLettersDirectory;
+    private String lettersDirectory;
 
     String indexPath;
     private String textDocumentName;
@@ -77,12 +78,8 @@ public class SearchFilesImpl implements SearchFiles
     public List<Letter> search(String searchTerm, String language, boolean fuzzy)
     throws Exception
     {
-        String lettersDirectory;
-        if (language != null && !language.equals(defaultLanguage)) {
-            lettersDirectory = baseLettersDirectory + "/" + language;
-        } else {
-            lettersDirectory = baseLettersDirectory;
-        }
+        lettersDirectory = baseLettersDirectory;
+
         String indexDir = lettersDirectory + "/" + indexPath;
 
         Directory dir = FSDirectory.open(Paths.get(indexDir));
@@ -90,9 +87,9 @@ public class SearchFilesImpl implements SearchFiles
         IndexSearcher searcher = new IndexSearcher(reader);
         TopDocs foundDocs;
         if (fuzzy) {
-            Term term = new Term("letters", searchTerm);
+            Term term = new Term(searchTerm);
             Query fuzzyQuery = new FuzzyQuery(term);
-            foundDocs = searcher.search(fuzzyQuery, 2);
+            foundDocs = searcher.search(fuzzyQuery, 10);
         }
         else {
             foundDocs = searchInContent(searchTerm, searcher);
@@ -108,8 +105,12 @@ public class SearchFilesImpl implements SearchFiles
 
     private Letter getLetter(Document doc)
     {
-        String documentNumber = doc.getField("path").stringValue().replace(baseLettersDirectory, "").replace(textDocumentName, "").replace("/", "");
-
+        String stringValue = doc.getField("path").stringValue();
+        String documentNumber = stringValue.substring(stringValue
+                .lastIndexOf("/Schwartze/") + "Schwartze/".length() + 1, stringValue.lastIndexOf("/tekst"));
+        if (documentNumber.contains("/")) {
+            documentNumber = documentNumber.substring(3);
+        }
         if (NumberUtils.isCreatable(documentNumber)) {
             return letterDao.getLetterForNumber(Integer.parseInt(documentNumber));
         }

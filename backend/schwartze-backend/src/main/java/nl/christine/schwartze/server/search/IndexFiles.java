@@ -9,5 +9,5 @@ package nl.christine.schwartze.server.search;
 
 public interface IndexFiles {
 
-    int indexFiles(String language);
+    int indexFiles();
 }
