@@ -26,7 +26,7 @@ public class SubjectsController {
 
     Logger logger = LoggerFactory.getLogger(SubjectsController.class);
 
-    @Value("${defaultlanguage}")
+    @Value("${nl.christine.schwartze.defaultlanguage}")
     private String defaultLanguage;
 
     @Autowired

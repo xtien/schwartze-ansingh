@@ -22,7 +22,7 @@ import java.io.IOException;
 @Component("translateService")
 public class TranslateServiceImpl implements TranslateService {
 
-    @Value("${defaultlanguage}")
+    @Value("${nl.christine.schwartze.defaultlanguage}")
     private String defaultLanguage;
 
     @Autowired

@@ -268,17 +268,17 @@ function Letters() {
                                     />
                                 </form>
                             </div>
-                            {/*<div className='col-sm-4'>*/}
-                            {/*    <div className='d-flex flex-row me-3 mt-2'>*/}
-                            {/*        <div className='me-3'>*/}
-                            {/*            {t('fuzzy-search')}</div>*/}
-                            {/*        <input*/}
-                            {/*            type="checkbox"*/}
-                            {/*            onChange={handleFuzzy}*/}
+                            <div className='col-sm-4'>
+                                <div className='d-flex flex-row me-3 mt-2'>
+                                    <div className='me-3'>
+                                        {t('fuzzy-search')}</div>
+                                    <input
+                                        type="checkbox"
+                                        onChange={handleFuzzy}
 
-                            {/*        />*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     }
                 </div>

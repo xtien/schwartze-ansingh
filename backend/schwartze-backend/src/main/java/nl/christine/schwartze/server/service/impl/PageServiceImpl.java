@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component("pageService")
 public class PageServiceImpl implements PageService {
 
-    @Value("${defaultlanguage}")
+    @Value("${nl.christine.schwartze.defaultlanguage}")
     private String defaultLanguage;
 
     @Autowired

@@ -38,7 +38,7 @@ public class GetAndTranslateTest {
     String testText = "Carta en Español";
     String translatedText = "Carta en Español";
 
-    @Value("${defaultlanguage}")
+    @Value("${nl.christine.schwartze.defaultlanguage}")
     private String defaultLanguage;
 
     String fileName1 = "/home/christine/Documents/Schwartze/es/17/tekst.txt";

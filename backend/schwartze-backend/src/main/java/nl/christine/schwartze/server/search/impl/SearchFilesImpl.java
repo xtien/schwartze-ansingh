@@ -32,11 +32,12 @@ import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component("searchFiles")
@@ -45,8 +46,12 @@ public class SearchFilesImpl implements SearchFiles
 
     private final Comparator<Letter> compareByDate;
 
-    @Value("${defaultlanguage}")
+    @Value("${nl.christine.schwartze.defaultlanguage}")
     private String defaultLanguage;
+    @Value("${nl.christine.schwartze.docdir}")
+    private String docDir;
+    @Value("${nl.christine.schwartze.textFileName}")
+    private String textFileName;
 
     @Autowired
     private SchwartzeProperties properties;
@@ -58,7 +63,6 @@ public class SearchFilesImpl implements SearchFiles
     private String lettersDirectory;
 
     String indexPath;
-    private String textDocumentName;
 
     public SearchFilesImpl()
     {
@@ -71,11 +75,10 @@ public class SearchFilesImpl implements SearchFiles
     {
         baseLettersDirectory = properties.getProperty("letters_directory");
         indexPath = properties.getProperty("index_directory");
-        textDocumentName = properties.getProperty("text_document_name");
     }
 
     @Override
-    public List<Letter> search(String searchTerm, String language, boolean fuzzy)
+    public List<Letter> search(String searchTerm, String language)
     throws Exception
     {
         lettersDirectory = baseLettersDirectory;
@@ -85,29 +88,58 @@ public class SearchFilesImpl implements SearchFiles
         Directory dir = FSDirectory.open(Paths.get(indexDir));
         IndexReader reader = DirectoryReader.open(dir);
         IndexSearcher searcher = new IndexSearcher(reader);
-        TopDocs foundDocs;
-        if (fuzzy) {
-            Term term = new Term(searchTerm);
-            Query fuzzyQuery = new FuzzyQuery(term);
-            foundDocs = searcher.search(fuzzyQuery, 10);
-        }
-        else {
-            foundDocs = searchInContent(searchTerm, searcher);
-        }
-
+        TopDocs foundDocs = searchInContent(searchTerm, searcher);
         StoredFields storedFields = reader.storedFields();
         List<Document> documents = new ArrayList<>();
         for (ScoreDoc scoreDoc : foundDocs.scoreDocs) {
             documents.add(storedFields.document(scoreDoc.doc));
         }
-        return documents.stream().map(doc -> getLetter(doc)).sorted(compareByDate).collect(Collectors.toList());
+        return deDuplicate(documents);
+    }
+
+    private List<Letter> deDuplicate(List<Document> documents)
+    {
+        List<Letter> list = documents
+                .stream()
+                .map(this::getLetter)
+                .collect(Collectors.toList());
+        Map<Integer, Letter> map = list
+                .stream()
+                .collect(Collectors.toMap(Letter::getNumber, Function.identity(), (a, b) -> a));
+        return map.values().stream().sorted(compareByDate).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Letter> fuzzySearch(String searchTerm, String language)
+    throws Exception
+    {
+        // Use the same index directory as the normal search
+        lettersDirectory = baseLettersDirectory;
+        String indexDir = lettersDirectory + "/" + indexPath;
+
+        Directory dir = FSDirectory.open(Paths.get(indexDir));
+        IndexReader reader = DirectoryReader.open(dir);
+        IndexSearcher searcher = new IndexSearcher(reader);
+
+        // Build a fuzzy query on the contents field
+        // MaxEdits 2 allows up to two edits; adjust prefix length if needed
+        Term term = new Term("contents", searchTerm);
+        FuzzyQuery fuzzyQuery = new FuzzyQuery(term, 2);
+
+        TopDocs foundDocs = searcher.search(fuzzyQuery, 50);
+        StoredFields storedFields = reader.storedFields();
+        List<Document> documents = new ArrayList<>();
+        for (ScoreDoc scoreDoc : foundDocs.scoreDocs) {
+            documents.add(storedFields.document(scoreDoc.doc));
+        }
+        return deDuplicate(documents);
     }
 
     private Letter getLetter(Document doc)
     {
         String stringValue = doc.getField("path").stringValue();
         String documentNumber = stringValue.substring(stringValue
-                .lastIndexOf("/Schwartze/") + "Schwartze/".length() + 1, stringValue.lastIndexOf("/tekst"));
+                .lastIndexOf("/" + docDir) + docDir.length() + 2, stringValue.lastIndexOf("/" + textFileName));
         if (documentNumber.contains("/")) {
             documentNumber = documentNumber.substring(3);
         }
@@ -122,6 +154,6 @@ public class SearchFilesImpl implements SearchFiles
     {
         QueryParser qp = new QueryParser("contents", new StandardAnalyzer());
         Query query = qp.parse(textToFind);
-        return searcher.search(query, 10);
+        return searcher.search(query, 50);
     }
-}
+ }

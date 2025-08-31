@@ -42,9 +42,9 @@ public class IndexFilesImpl implements IndexFiles
 
     Logger logger = LoggerFactory.getLogger(IndexFilesImpl.class);
 
-    @Value("${defaultlanguage}")
+    @Value("${nl.christine.schwartze.defaultlanguage}")
     private String defaultLanguage;
-    @Value("${languages}")
+    @Value("${nl.christine.schwartze.languages}")
     private String[] languages;
 
     @Autowired

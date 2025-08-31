@@ -62,7 +62,7 @@ public class TextServiceImpl implements TextService {
     @Autowired
     private SchwartzeProperties properties;
 
-    @Value("${defaultlanguage}")
+    @Value("${nl.christine.schwartze.defaultlanguage}")
     private String defaultLanguage;
 
     @PostConstruct

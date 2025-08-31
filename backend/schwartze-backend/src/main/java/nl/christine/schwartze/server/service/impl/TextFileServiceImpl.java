@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Component("textFileService")
 public class TextFileServiceImpl implements TextFileService {
 
-    @Value("${defaultlanguage}")
+    @Value("${nl.christine.schwartze.defaultlanguage}")
     private String defaultLanguage;
 
     private final Comparator<File> comparator = Comparator.comparingInt(this::num);

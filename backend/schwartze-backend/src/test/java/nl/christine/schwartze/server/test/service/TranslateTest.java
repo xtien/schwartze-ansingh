@@ -38,7 +38,7 @@ public class TranslateTest {
     String testText = "Brief in het Nederlands";
     String translatedText = "Carta en neerlandés";
 
-    @Value("${defaultlanguage}")
+    @Value("${nl.christine.schwartze.defaultlanguage}")
     private String defaultLanguage;
 
     String fileName1 = "/home/christine/Documents/Schwartze/nl/17/tekst.txt";

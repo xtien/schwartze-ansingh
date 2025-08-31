@@ -13,6 +13,8 @@ import java.util.List;
 
 public interface SearchFiles {
 
-    List<Letter> search(String searchTerm, String language, boolean fuzzy) throws Exception;
+    List<Letter> search(String searchTerm, String language) throws Exception;
 
+    List<Letter> fuzzySearch(String searchTerm, String language)
+    throws Exception;
 }

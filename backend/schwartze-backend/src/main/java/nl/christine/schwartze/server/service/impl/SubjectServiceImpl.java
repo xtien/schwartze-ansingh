@@ -28,7 +28,7 @@ public class SubjectServiceImpl implements SubjectService {
 
     Logger logger = LoggerFactory.getLogger(SubjectServiceImpl.class);
 
-    @Value("${defaultlanguage}")
+    @Value("${nl.christine.schwartze.defaultlanguage}")
     private String defaultLanguage;
 
     @Autowired
