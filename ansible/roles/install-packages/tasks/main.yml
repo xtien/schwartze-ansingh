@@ -1,0 +1,61 @@
+- name: install packages
+  become: true
+  become_user: root
+  apt:
+    name:
+      - apache2
+      - openjdk-21-jdk
+      - postgresql
+      - postgresql-contrib
+      - python3-pip
+      - python3-dev
+      - libpq-dev
+      - python3-psycopg2
+
+- name: Create database user
+  community.postgresql.postgresql_user:
+    state: present
+    name: '{{ schwartze__database_user }}'
+    password: '{{ schwartze__database_password }}'
+  become: true
+  become_user: '{{ schwartze__postgres_user }}'
+
+- name: Create database
+  community.postgresql.postgresql_db:
+    state: present
+    name: '{{ schwartze__database_name }}'
+    owner: '{{ schwartze__database_user }}'
+  become: true
+  become_user: '{{ schwartze__postgres_user }}'
+  register: ciphermail_portal__register_postgresql_status
+
+- name: Grant user access to database
+  community.postgresql.postgresql_privs:
+    type: database
+    database: '{{ schwartze__database_name }}'
+    roles: '{{ schwartze__database_user }}'
+    grant_option: no
+    privs: all
+  become: true
+  become_user: '{{ schwartze__postgres_user }}'
+
+- name: Allow md5 connection for the database user
+  community.postgresql.postgresql_pg_hba:
+    dest: '/etc/postgresql/16/main/pg_hba.conf'
+    contype: host
+    databases: all
+    method: md5
+    users: '{{ schwartze__database_user }}'
+    create: true
+  become: true
+  become_user: '{{ schwartze__postgres_user }}'
+  register: schwartze__change_pg_hba
+
+- name: Restart Postgres if pg_hba.conf was changed
+  become: true
+  become_user: root
+  ansible.builtin.service:
+    name: postgresql
+    state: restarted
+  when: schwartze__change_pg_hba.changed
+

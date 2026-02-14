@@ -1,0 +1,9 @@
+---
+
+schwartze__templatesSourceDir: '~/git/ciphermail-download-portal-v2/ciphermail-portal/conf/'
+schwartze__templatesDestDir: '{{ schwartze__home }}/conf'
+schwartze__licenseDir: '{{ schwartze__home }}/licenses'
+schwartze__keysDir: '{{ schwartze__home }}/licenses/keys'
+schwartze__keystoreSourceDir: '~/git/ciphermail-download-portal-v2/conf/keystore/'
+schwartze__keystoreDestDir: '{{ schwartze__home }}/conf/keystore'
+schwartze__logDir: '/var/log/schwartze'

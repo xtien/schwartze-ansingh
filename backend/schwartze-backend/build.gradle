@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'Schwartze'
-version '2.1.1-SNAPSHOT'
+version '2.2.0-SNAPSHOT'
 
 ext {
     springSecurityVersion = "6.4.5"

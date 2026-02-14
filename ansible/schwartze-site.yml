@@ -1,0 +1,41 @@
+---
+- hosts: all
+  vars:
+    schwartze__ip_number: '192.168.122.241'
+    schwartze__home_dir: '/home/christine/git/schwartze-ansing'
+    schwartze__servername: 'localhost'
+    schwartze__database_comment: 'schwartze site database'
+    schwartze__username: 'christine'
+    schwartze__grouptitle: 'christine'
+
+    schwartze__home: '/opt/schwartze'
+    schwartze__backend_port: '8084'
+    schwartze__jar_version: '2.2.0-SNAPSHOT'
+    schwartze__jar_name: 'schwartze-backend{{schwartze__jar_version}}.jar'
+
+    schwartze__database_name: 'schwartze'
+    schwartze__database_user: 'schwartze'
+    schwartze__database_password: 'schwartze'
+    schwartze__postgres_user: 'postgres'
+
+  tasks:
+
+    - name: install packages role
+      ansible.builtin.import_role:
+        name: install-packages
+
+    - name: install backend role
+      ansible.builtin.import_role:
+        name: install-backend
+
+    - name: install frontend role
+      ansible.builtin.import_role:
+        name: install-frontend
+
+  handlers:
+    - name: Restart apache
+      become: true
+      become_user: root
+      ansible.builtin.service:
+        name: apache2
+        state: restarted

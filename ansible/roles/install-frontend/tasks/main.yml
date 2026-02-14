@@ -1,0 +1,36 @@
+- name: Create sites-available if it does not exist
+  become: true
+  become_user: root
+  ansible.builtin.file:
+    path: /etc/apache2/sites-available
+    state: directory
+    mode: '0755'
+  notify: [ Restart apache ]
+
+- name: Create sites-enabled if it does not exist
+  become: true
+  become_user: root
+  ansible.builtin.file:
+    path: /etc/apache2/sites-enabled
+    state: directory
+    mode: '0755'
+
+- name: copy config file
+  become: true
+  become_user: root
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    loop:
+      - src: sites-available/www.schwartze-ainsingh.com.conf
+        dest: /etc/apache2/sites-available/www.schwartze-ainsingh.com.conf
+      - src: sites-available/schwartze-ainsingh.com.conf
+        dest: /etc/apache2/sites-available/schwartze-ainsingh.com.conf
+      - src: sites-available/schwartze-ainsingh.nl.conf
+        dest: /etc/apache2/sites-available/schwartze-ainsingh.nl.conf
+      - src: sites-available/www.schwartze-ansingh.com-le-ssl
+        dest: /etc/apache2/sites-available/www.schwartze-ansingh.com-le-ssl
+      - src: sites-available/000-default.conf
+        dest: /etc/apache2/sites-available/000-default.conf
+      - src: sites-available/default-ssl.conf
+        dest: /etc/apache2/sites-available/default-ssl.conf

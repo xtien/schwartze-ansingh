@@ -1,0 +1,47 @@
+
+- name: Check if file exists
+  delegate_to: localhost
+  stat:
+    path: "{{schwartze__jarFileName}}"
+  register: result
+
+- name: Show result
+  fail:
+    msg: "{{schwartze__jarFileName}} does not exist!"
+  when: not result.stat.exists
+
+- name: create working directory
+  become: true
+  become_user: root
+  ansible.builtin.file:
+    path: "{{schwartze__home}}"
+    owner: "{{schwartze__user}}"
+    group: "{{schwartze__group}}"
+    state: directory
+
+- name: copy jar file
+  ansible.builtin.copy:
+    src: "{{schwartze__jarFileName}}"
+    dest: '{{ schwartze__home }}'
+
+- name: copy service file
+  become: true
+  become_user: root
+  ansible.builtin.template:
+    src: 'roles/install-backend/templates/etc/systemd/system/schwartze.service.j2'
+    dest: '/etc/systemd/system/schwartze.service'
+
+- name: create log dir
+  become: true
+  become_user: root
+  ansible.builtin.file:
+    path: '{{schwartze__logDir}}'
+    owner: "{{schwartze__username}}"
+    state: directory
+
+- name: reload systemd
+  become: true
+  become_user: root
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
