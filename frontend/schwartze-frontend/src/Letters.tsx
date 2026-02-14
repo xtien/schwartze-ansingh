@@ -32,6 +32,8 @@ import type {AxiosResponse} from "axios";
 import ReactGA from "react-ga4";
 import {useTranslation} from "react-i18next";
 import i18next from "i18next";
+import {QuestionCircle} from "react-bootstrap-icons";
+import {Alert} from "reactstrap";
 
 const lettersApi = new LettersApi(apiConfig);
 const personApi = new PersonApi(apiConfig);
@@ -40,10 +42,10 @@ const searchApi = new LuceneSearchApi(apiConfig)
 function Letters() {
     const {t} = useTranslation();
 
-     useEffect(() => {
+    useEffect(() => {
         // Send pageview with a custom path
         ReactGA.send({hitType: "pageview", page: "/get_letters", title: "Letters Page"});
-    }, )
+    },)
 
     const location = useLocation()
     const params = location.pathname.substring(1).split('/')
@@ -64,6 +66,7 @@ function Letters() {
     const [toFrom] = React.useState<LettersRequestToFromEnum>(toFromString === 'to' ? LettersRequestToFromEnum.To : LettersRequestToFromEnum.From);
     const [search_term, setSearchTerm] = React.useState('');
     const [fuzzy_, setFuzzy] = React.useState(false);
+    const [showFuzzyAlert, setShowFuzzyAlert] = React.useState(false);
 
     function getLetters(orderBy: LettersRequestOrderByEnum) {
         if (isPerson) {
@@ -124,13 +127,13 @@ function Letters() {
                 language: i18next.language
             };
 
-                searchApi.searchLetters(searchRequest).then((response) => {
-                    if (response.data.letters != null) {
-                        setLetters(response.data.letters)
-                    }
-                }).catch((error) => {
-                    console.log(error)
-                })
+            searchApi.searchLetters(searchRequest).then((response) => {
+                if (response.data.letters != null) {
+                    setLetters(response.data.letters)
+                }
+            }).catch((error) => {
+                console.log(error)
+            })
 
         } else {
             const request: LettersRequest = {
@@ -163,7 +166,7 @@ function Letters() {
     }
 
     function handleSearchSubmit() {
-        navigate('/search_letters/' + search_term + '/'+(fuzzy_ ? 'true' : 'false'));
+        navigate('/search_letters/' + search_term + '/' + (fuzzy_ ? 'true' : 'false'));
     }
 
     function navigateTo(location: string) {
@@ -231,9 +234,19 @@ function Letters() {
         setFuzzy(!fuzzy_)
     }
 
+    function showFuzzyInfo() {
+        setShowFuzzyAlert(!showFuzzyAlert)
+    }
+
     return (
         <div className='container-fluid me-sm-5 ms-sm-5'>
             <div>
+                {showFuzzyAlert ?
+                    <div className='d-flex flex-row-reverse  pe-5 mt-3 m-lg-5'>
+                        <Alert key='info' variant='info' className='w-25 '>
+                            {t('fuzzy-alert')}
+                        </Alert>
+                    </div> : null}
                 {person != null || myLocation != null ?
                     <div className='mt-3 m-lg-5'>
                         {person != null ? (strings.personLettersText + " " + (toFrom === PersonLettersRequestToFromEnum.From ? strings.from : strings.to) + ' ' + createFullName(person)) : ''}
@@ -270,13 +283,13 @@ function Letters() {
                             </div>
                             <div className='col-sm-4'>
                                 <div className='d-flex flex-row me-3 mt-2'>
-                                    <div className='me-3'>
-                                        {t('fuzzy-search')}</div>
-                                    <input
+                                    <div className='ms-2 mt-1'><input
                                         type="checkbox"
                                         onChange={handleFuzzy}
-
-                                    />
+                                    /></div>
+                                    <div className='ms-2'>
+                                        {t('fuzzy-search')}</div>
+                                    <div className="ms-2 mb-3" onClick={showFuzzyInfo}><QuestionCircle/></div>
                                 </div>
                             </div>
                         </div>

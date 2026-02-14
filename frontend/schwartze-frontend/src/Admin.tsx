@@ -42,7 +42,9 @@ function Admin() {
         logout()
         userApi.logout({}).then(() => {
             console.log("logged out")
-            navigate("/")
+            navigate("/letters")
+        }).catch(error => {
+            console.log(error)
         })
     }
 

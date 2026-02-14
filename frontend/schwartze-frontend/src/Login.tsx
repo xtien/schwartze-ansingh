@@ -36,7 +36,7 @@ function Login() {
             .then(response => {
                 registerSuccessfulLogin(username, password);
                 setAuthorities(response.data.authorities);
-                navigate('/get_letters/0');
+                navigate('/get_letters');
             })
             .catch(error => {
                 console.log(error)

@@ -69,8 +69,6 @@ function LetterPage() {
     const [imageData, setImageData] = useState<string[]>([])
     const [edit_letter, setEdit_letter] = useState(false)
     const [delete_letter, setDelete_letter] = useState(false)
-    const [showError, setShowError] = useState(false)
-    const [error, setError] = useState<string>()
     const [translated, setTranslated] = useState(0)
 
     const {i18n} = useTranslation();
@@ -90,8 +88,6 @@ function LetterPage() {
 
         }).catch((error) => {
             console.log(error)
-            setShowError(true)
-            setError(error.toString())
         })
     }, [i18n.language, translated, letterNumber])
 
@@ -206,16 +202,11 @@ function LetterPage() {
     }
 
     return (
-        <div className='container-fluid me-sm-5 ms-sm-5'>
-            {
-                error != null && showError ?
-                    <div className='alert alert-danger' role='alert'></div>
-                    : null
-            }
+        <div className='container-fluid pe-sm-5 ps-sm-5'>
 
             {showEdit ? null : (
 
-                <div>
+                <div className="me-sm-5">
                     <div className="row">
                         <div className='col'>
                             <button type="button"

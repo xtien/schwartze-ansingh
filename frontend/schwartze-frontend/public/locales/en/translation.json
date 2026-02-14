@@ -91,5 +91,6 @@
   "translateLetter": "Translate letter",
   "number": "Number",
   "comments": "Remarks",
-  "fuzzy-search": "Fuzzy Search"
+  "fuzzy-search": "Fuzzy Search",
+  "fuzzy-alert": "Checking this box will allow search to find partial matches."
 }
